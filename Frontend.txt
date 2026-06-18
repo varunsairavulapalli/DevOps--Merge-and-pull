@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Tracker</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+background:#f2f4f8;
+}
+
+header{
+background:#0f172a;
+color:white;
+padding:20px;
+text-align:center;
+font-size:28px;
+font-weight:bold;
+}
+
+.container{
+width:90%;
+max-width:1000px;
+margin:30px auto;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 0 10px rgba(0,0,0,.2);
+}
+
+h2{
+margin-bottom:20px;
+}
+
+.form{
+display:grid;
+grid-template-columns:1fr 1fr 1fr auto;
+gap:10px;
+margin-bottom:20px;
+}
+
+input,select{
+padding:12px;
+border:1px solid #ccc;
+border-radius:5px;
+font-size:15px;
+}
+
+button{
+padding:12px 20px;
+background:#2563eb;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+table th{
+background:#2563eb;
+color:white;
+padding:12px;
+}
+
+table td{
+padding:12px;
+border-bottom:1px solid #ddd;
+text-align:center;
+}
+
+.pending{
+color:orange;
+font-weight:bold;
+}
+
+.progress{
+color:blue;
+font-weight:bold;
+}
+
+.completed{
+color:green;
+font-weight:bold;
+}
+
+.delete{
+background:red;
+}
+
+.delete:hover{
+background:darkred;
+}
+
+.stats{
+display:flex;
+justify-content:space-around;
+margin-bottom:20px;
+}
+
+.card{
+background:#2563eb;
+color:white;
+padding:20px;
+border-radius:10px;
+width:30%;
+text-align:center;
+}
+
+.card h3{
+font-size:30px;
+margin-top:10px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+Project Tracker
+</header>
+
+<div class="container">
+
+<div class="stats">
+
+<div class="card">
+Total Tasks
+<h3 id="total">0</h3>
+</div>
+
+<div class="card">
+Completed
+<h3 id="completed">0</h3>
+</div>
+
+<div class="card">
+Pending
+<h3 id="pending">0</h3>
+</div>
+
+</div>
+
+<h2>Add New Task</h2>
+
+<div class="form">
+
+<input type="text" id="project" placeholder="Project Name">
+
+<input type="text" id="task" placeholder="Task Name">
+
+<select id="status">
+<option>Pending</option>
+<option>In Progress</option>
+<option>Completed</option>
+</select>
+
+<button onclick="addTask()">Add</button>
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Project</th>
+<th>Task</th>
+<th>Status</th>
+<th>Delete</th>
+</tr>
+
+</thead>
+
+<tbody id="tbody">
+
+</tbody>
+
+</table>
+
+</div>
+
+<script>
+
+let tasks=JSON.parse(localStorage.getItem("tasks")) || [];
+
+function saveData(){
+
+localStorage.setItem("tasks",JSON.stringify(tasks));
+
+render();
+
+}
+
+function addTask(){
+
+let project=document.getElementById("project").value;
+
+let task=document.getElementById("task").value;
+
+let status=document.getElementById("status").value;
+
+if(project=="" || task==""){
+
+alert("Enter Project and Task");
+
+return;
+
+}
+
+tasks.push({
+
+project,
+
+task,
+
+status
+
+});
+
+document.getElementById("project").value="";
+
+document.getElementById("task").value="";
+
+saveData();
+
+}
+
+function deleteTask(index){
+
+tasks.splice(index,1);
+
+saveData();
+
+}
+
+function render(){
+
+let tbody=document.getElementById("tbody");
+
+tbody.innerHTML="";
+
+let completed=0;
+
+let pending=0;
+
+tasks.forEach((item,index)=>{
+
+if(item.status=="Completed")
+
+completed++;
+
+else
+
+pending++;
+
+let cls="pending";
+
+if(item.status=="Completed")
+
+cls="completed";
+
+if(item.status=="In Progress")
+
+cls="progress";
+
+tbody.innerHTML+=`
+
+<tr>
+
+<td>${item.project}</td>
+
+<td>${item.task}</td>
+
+<td class="${cls}">${item.status}</td>
+
+<td>
+
+<button class="delete" onclick="deleteTask(${index})">
+
+Delete
+
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+document.getElementById("total").innerHTML=tasks.length;
+
+document.getElementById("completed").innerHTML=completed;
+
+document.getElementById("pending").innerHTML=pending;
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
